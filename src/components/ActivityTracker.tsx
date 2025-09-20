@@ -6,6 +6,7 @@ import { TimerModal } from './TimerModal';
 import { ProgressCircle } from './ProgressCircle';
 import { ACTIVITY_TEMPLATES } from '../utils/activities';
 import { getActivityIcon } from '../utils/icons';
+import { checkAndAwardAchievements } from '../utils/achievements';
 
 interface ActivityTrackerProps {
   user: User;
@@ -13,6 +14,7 @@ interface ActivityTrackerProps {
   setActivities: (activities: Activity[]) => void;
   dailyProgress: number;
   setDailyProgress: (progress: number) => void;
+  setUser: (user: User) => void;
 }
 
 export const ActivityTracker: React.FC<ActivityTrackerProps> = ({
@@ -20,7 +22,8 @@ export const ActivityTracker: React.FC<ActivityTrackerProps> = ({
   activities,
   setActivities,
   dailyProgress,
-  setDailyProgress
+  setDailyProgress,
+  setUser
 }) => {
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [showTimerModal, setShowTimerModal] = useState(false);
@@ -64,7 +67,7 @@ export const ActivityTracker: React.FC<ActivityTrackerProps> = ({
   };
 
   const completeActivity = (activityId: string) => {
-    setActivities(activities.map(activity => {
+    const updatedActivities = activities.map(activity => {
       if (activity.id === activityId) {
         const newProgress = dailyProgress + activity.allocatedCalories;
         setDailyProgress(Math.min(newProgress, user.dailyCalorieGoal));
@@ -76,7 +79,14 @@ export const ActivityTracker: React.FC<ActivityTrackerProps> = ({
         };
       }
       return activity;
-    }));
+    });
+    
+    setActivities(updatedActivities);
+    
+    // Check for new achievements
+    const newProgress = dailyProgress + (activities.find(a => a.id === activityId)?.allocatedCalories || 0);
+    checkAndAwardAchievements(user, updatedActivities, newProgress, setUser);
+    
     setSelectedActivity(null);
     setShowTimerModal(false);
   };

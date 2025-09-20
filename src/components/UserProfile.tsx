@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Camera, Calculator, Target, Award, Edit3 } from 'lucide-react';
 import { User } from '../types';
 import { BMIModal } from './BMIModal';
+import { AchievementsModal } from './AchievementsModal';
 import { calculateDailyCalorieGoal } from '../utils/calculations';
 
 interface UserProfileProps {
@@ -11,6 +12,7 @@ interface UserProfileProps {
 
 export const UserProfile: React.FC<UserProfileProps> = ({ user, setUser }) => {
   const [showBMIModal, setShowBMIModal] = useState(false);
+  const [showAchievementsModal, setShowAchievementsModal] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [tempName, setTempName] = useState(user.name);
@@ -192,7 +194,15 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, setUser }) => {
             <div className="w-10 h-10 bg-gradient-to-r from-[#7ED957] to-[#1DA1F2] rounded-full flex items-center justify-center">
               <Award className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-[#3A3A3A]">Achievements</h3>
+            <div className="flex-1 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-[#3A3A3A]">Achievements</h3>
+              <button
+                onClick={() => setShowAchievementsModal(true)}
+                className="bg-[#7ED957] hover:bg-[#6BC544] text-white px-3 py-1 rounded-full text-sm transition-colors font-medium"
+              >
+                View All
+              </button>
+            </div>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -208,6 +218,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, setUser }) => {
               ))
             ) : (
               <p className="text-gray-500 text-sm">Complete activities to earn achievements</p>
+            )}
+            {user.achievements.length > 5 && (
+              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-bold">
+                +{user.achievements.length - 5}
+              </div>
             )}
           </div>
         </div>
@@ -275,6 +290,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, setUser }) => {
             });
           }}
           currentData={user.bmi}
+        />
+      )}
+
+      {showAchievementsModal && (
+        <AchievementsModal
+          onClose={() => setShowAchievementsModal(false)}
+          achievements={user.achievements}
         />
       )}
     </div>

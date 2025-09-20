@@ -106,6 +106,7 @@ function App() {
             setActivities={setActivities}
             dailyProgress={dailyProgress}
             setDailyProgress={setDailyProgress}
+            setUser={setUser}
           />
         )}
       </main>
